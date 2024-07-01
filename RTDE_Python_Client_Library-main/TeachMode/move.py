@@ -37,7 +37,7 @@ def move(loop_count=1, filepath="robot_positions.txt", speed=0.05):
     script_commands+= "  number = 0\n"
     script_commands+= f"  while number<{loop_count}:\n "
     for pos in positions:
-        script_commands += f"    movej({pos}, a=5, v={speed}, r=0.005)\n"
+        script_commands += f"    movej({pos}, a=0.2, v={speed}, r=0.005)\n"
     script_commands += "    number = number+1\n  end\nend\nProgram()"
     send_urscript(robot_ip, port, script_commands)
     

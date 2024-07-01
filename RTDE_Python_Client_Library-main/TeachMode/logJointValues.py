@@ -35,6 +35,8 @@ def send_popup(ip, port, message, title="Position Adjustment", blocking=True):
 def stop():
     global stopCollection 
     stopCollection = True
+    send_script_command(ROBOT_IP, 29999, 'close popup')
+    send_script_command(ROBOT_IP, 29999, 'stop')
 
 def save_positions(newFilename):
     with open(newFilename, 'w') as file:

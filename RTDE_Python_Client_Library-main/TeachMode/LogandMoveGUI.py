@@ -6,14 +6,19 @@ import threading
 from tkinter import messagebox, simpledialog, filedialog
 import os
 from PIL import ImageTk, Image
+global running
+running = False
 #start recording
 def start():
-    
-    ljv.begin(entries['x'].get(), entries['y'].get(), entries['z'].get(), entries['rx'].get(), entries['ry'].get(), entries['rz'].get())
-    
+    global running
+    if not running:
+        ljv.begin(entries['x'].get(), entries['y'].get(), entries['z'].get(), entries['rx'].get(), entries['ry'].get(), entries['rz'].get())
+        running = True
 #stop recording
 def stop():
     ljv.stop()
+    global running 
+    running = False
 
 #using threading to allow for the start and stop functions to run concurrently
 def start_thread():
@@ -67,9 +72,9 @@ def validate_input(*args):
     if not value.isdigit():
         value = value[:-1]
         loop_count_value.set(value)
-def runCustomPositions(loop_count):
+def runCustomPositions(loop_count,speed):
     filepath = filedialog.askopenfilename(initialdir = "/", title = "Select file", filetypes = (("text files","*.txt"),("all files","*.*")))
-    move_through_positions(loop_count, filepath)
+    move_through_positions(loop_count, filepath,speed)
 
 def save_positions():
     user_input = simpledialog.askstring("Input File Name", "Please enter a name for the position file:")
@@ -118,10 +123,9 @@ tk.Button(root, text="Stop", command=stop_thread, height=2, width=10).grid(row=m
 tk.Button(root, text="Save Positions", command=save_positions, height=2, width=10).grid(row=middle_row + 2, column=1, padx=(150, 20))
 
 
-tk.Label(root, text="Move Robot Through Positions",font=("Helvetica", 14, "bold")).grid(row=middle_row - 1,sticky='w', column=2,padx=(50,0))
-tk.Button(root, text="Start Move", command=lambda: move_through_positions(loopCount=loop_count.get(), speed=speed.get()),height=2, width=10).grid(row=middle_row, column=2, padx=(0,20))
-tk.Button(root, text="Start Move with File", command=lambda: runCustomPositions(loop_count.get(),speed=speed.get()),height=2, width=20).grid(row=middle_row+1, column=2, padx=(0,20))
+tk.Label(root, text="Move Robot Through Positions",font=("Helvetica", 14, "bold")).grid(row=middle_row - 2,sticky='w', column=2,padx=(50,0))
+tk.Button(root, text="Start Move", command=lambda: move_through_positions(loopCount=loop_count.get(), speed=speed.get()),height=2, width=10).grid(row=middle_row-1, column=2, padx=(0,20))
+tk.Button(root, text="Stop Move", command=lambda: ljv.send_script_command("192.168.137.149",29999,"stop"),height=2, width=10).grid(row=middle_row, column=2, padx=(0,20))
 
-messagebox.showinfo("Warning","Before Starting the Recording please place the robot in automatic mode and then go the the \"Move\" Tab on the pendant and use the \"Allign\" feature. Then place the robot back into Remote mode.")
+tk.Button(root, text="Start Move with File", command=lambda: runCustomPositions(loop_count.get(),speed=speed_value.get()),height=2, width=20).grid(row=middle_row+1, column=2, padx=(0,20))
 root.mainloop()
-
